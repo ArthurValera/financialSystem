@@ -4,9 +4,7 @@ import com.financial.system.financial.system.dto.PessoaCreateDTO;
 import com.financial.system.financial.system.dto.PessoaDetalhamentoDTO;
 import com.financial.system.financial.system.dto.PessoaListagemDTO;
 import com.financial.system.financial.system.dto.PessoaUpdateDTO;
-import com.financial.system.financial.system.model.Pessoa;
 import com.financial.system.financial.system.service.PessoaService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,23 +21,22 @@ public class PessoaController {
    private PessoaService pessoaService;
 
    @PostMapping
-   @Transactional
     public ResponseEntity create(@RequestBody @Valid PessoaCreateDTO data, UriComponentsBuilder uriBuilder){
        var pessoa = pessoaService.create(data);
        var uri = uriBuilder.path("/pessoa/{id}").buildAndExpand(pessoa.getId()).toUri();
        return ResponseEntity.created(uri).body(new PessoaDetalhamentoDTO(pessoa));
    }
 
-   @PutMapping
-   public ResponseEntity update(@RequestBody @Valid PessoaUpdateDTO data){
-      var pessoa = pessoaService.update(data);
-      return ResponseEntity.ok(new PessoaDetalhamentoDTO(pessoa));
-   }
-
    @GetMapping
    public ResponseEntity<Page<PessoaListagemDTO>> read(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
       var page = pessoaService.read(pageable);
       return ResponseEntity.ok(page);
+   }
+
+   @PutMapping
+   public ResponseEntity update(@RequestBody @Valid PessoaUpdateDTO data){
+      var pessoa = pessoaService.update(data);
+      return ResponseEntity.ok(new PessoaDetalhamentoDTO(pessoa));
    }
 
    @DeleteMapping("/{id}")

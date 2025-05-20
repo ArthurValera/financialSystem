@@ -1,5 +1,6 @@
 package com.financial.system.financial.system.model;
 
+import com.financial.system.financial.system.dto.EnderecoDTO;
 import com.financial.system.financial.system.dto.PessoaUpdateDTO;
 import com.financial.system.financial.system.dto.PessoaCreateDTO;
 import jakarta.persistence.*;
@@ -20,6 +21,8 @@ public class Pessoa {
     private Long id;
     private String nome;
     private Boolean ativo;
+    @Embedded
+    private Endereco endereco;
 
     public Pessoa(PessoaCreateDTO data){
         this.ativo = true;
@@ -36,6 +39,10 @@ public class Pessoa {
 
     public Boolean getAtivo() {
         return ativo;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
     }
 
     public void update(@Valid PessoaUpdateDTO data){
