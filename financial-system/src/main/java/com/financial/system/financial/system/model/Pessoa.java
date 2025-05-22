@@ -27,6 +27,9 @@ public class Pessoa {
     public Pessoa(PessoaCreateDTO data){
         this.ativo = true;
         this.nome = data.nome();
+        if (data.endereco() != null) {
+            this.endereco = new Endereco(data.endereco());
+        }
     }
 
     public Long getId() {
@@ -48,6 +51,8 @@ public class Pessoa {
     public void update(@Valid PessoaUpdateDTO data){
         if(data.nome() != null){
             this.nome = data.nome();
+        }if (data.endereco() != null){
+            this.endereco.atualiza(data.endereco());
         }
     }
 
