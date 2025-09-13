@@ -24,6 +24,13 @@ This project is an API for **financial control**, enabling the management of peo
 - Validate relationships between entities (e.g., transactions and people, transactions and categories).
 - Input validation with Bean Validation annotations.
 
+### 🔐 **Security (Work in Progress)**
+- Currently implementing **Spring Security** to handle authentication and authorization.
+- Future plans include:
+  - Role-based access control (e.g., admin, user).
+  - JWT token authentication for secure API access.
+  - Password encryption with BCrypt.
+    
 ---
 
 ## 🗂️ Project Structure
