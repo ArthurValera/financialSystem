@@ -71,7 +71,7 @@ Data Transfer Objects for requests and responses:
 
 ## 🚀 Technologies Used
 
-- **Java 17**: Main language.
+- **Java 21**: Main language.
 - **Spring Boot**: Framework for rapid backend development.
 - **Spring Data JPA**: ORM and repository abstraction.
 - **Hibernate Validator**: Input validation.
