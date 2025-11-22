@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class FinancialSystemApplication {
 
+    //ESCONDE A SENHA DO APLICATION PROPERTIES
+
 	public static void main(String[] args) {
 		SpringApplication.run(FinancialSystemApplication.class, args);
 	}
