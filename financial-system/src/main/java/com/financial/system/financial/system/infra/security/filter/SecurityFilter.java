@@ -26,22 +26,33 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+
+        return path.equals("/auth/login")
+                || (request.getMethod().equals("POST") && path.equals("/person"));
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
         String tokenJWT = resolveToken(request);
 
         if (tokenJWT != null) {
-            try{
+            try {
                 String subject = tokenService.getSubject(tokenJWT);
                 var personDetails = personDetailsService.loadUserByUsername(subject);
-                var authentication = new UsernamePasswordAuthenticationToken(personDetails,
-                        null,
-                        personDetails.getAuthorities());
+                var authentication = new UsernamePasswordAuthenticationToken(
+                        personDetails, null, personDetails.getAuthorities()
+                );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            }catch (JWTVerificationException exception){
-                System.out.println("Token invalido" + exception.getMessage());
+
+            } catch (JWTVerificationException exception) {
+                System.out.println("Token invalido: " + exception.getMessage());
             }
         }
 
@@ -51,9 +62,10 @@ public class SecurityFilter extends OncePerRequestFilter {
     private String resolveToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader == null || authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return null;
         }
-        return authorizationHeader.replace("Bearer ", "");
+
+        return authorizationHeader.replace("Bearer ", "").trim();
     }
 }
