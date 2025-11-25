@@ -25,9 +25,11 @@ public class Person {
     @Embedded
     private Address address;
 
-    public Person(PersonCreateDTO data){
+    public Person(PersonCreateDTO data, String encryptedPassword){
         this.active = true;
         this.name = data.name();
+        this.email = data.email();
+        this.password = encryptedPassword;
         if (data.address() != null) {
             this.address = new Address(data.address());
         }
