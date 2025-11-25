@@ -24,7 +24,6 @@ public class PersonService {
 
     @Transactional
     public Person create(PersonCreateDTO data) {
-
         var encryptedPassword = encoder.encode(data.password());
         var person = new Person(data, encryptedPassword);
         return personRep.save(person);

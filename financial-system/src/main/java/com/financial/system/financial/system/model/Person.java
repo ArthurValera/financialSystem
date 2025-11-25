@@ -17,9 +17,13 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false)
     private String password;
+    private String role = "ROLE_USER";
     private Boolean active;
 
     @Embedded
@@ -70,5 +74,9 @@ public class Person {
 
     public void delete() {
         this.active = false;
+    }
+
+    public String getRole() {
+    return role;
     }
 }

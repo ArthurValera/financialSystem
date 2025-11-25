@@ -22,12 +22,8 @@ public class PersonController {
     @Autowired
     private PersonService personService;
 
-    @Autowired
-    private PasswordEncoder encoder;
-
     @PostMapping
     public ResponseEntity<PersonDetailDTO> create(@RequestBody @Valid PersonCreateDTO data, UriComponentsBuilder uriBuilder){
-        var encryptedPassword = encoder.encode(data.password());
         var person = personService.create(data);
         var uri = uriBuilder.path("/person/{id}").buildAndExpand(person.getId()).toUri();
         return ResponseEntity.created(uri).body(new PersonDetailDTO(person));

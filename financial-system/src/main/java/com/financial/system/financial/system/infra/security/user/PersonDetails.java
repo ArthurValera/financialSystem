@@ -14,12 +14,6 @@ public class PersonDetails implements UserDetails {
     public PersonDetails(Person person){
         this.person = person;
     }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
     @Override
     public String getPassword() {
         return person.getPassword();
@@ -29,6 +23,12 @@ public class PersonDetails implements UserDetails {
     public String getUsername() {
         return person.getEmail();
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
 
     @Override
     public boolean isAccountNonExpired() {
