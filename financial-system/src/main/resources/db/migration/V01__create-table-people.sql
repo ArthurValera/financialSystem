@@ -10,7 +10,5 @@ CREATE TABLE people (
     district VARCHAR(100),
     zip_code VARCHAR(20),
     city VARCHAR(100),
-    state VARCHAR(50),
-
-    primary key(id)
+    state VARCHAR(50)
 );

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,8 +22,12 @@ public class PersonController {
     @Autowired
     private PersonService personService;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     @PostMapping
     public ResponseEntity<PersonDetailDTO> create(@RequestBody @Valid PersonCreateDTO data, UriComponentsBuilder uriBuilder){
+        var encryptedPassword = encoder.encode(data.password());
         var person = personService.create(data);
         var uri = uriBuilder.path("/person/{id}").buildAndExpand(person.getId()).toUri();
         return ResponseEntity.created(uri).body(new PersonDetailDTO(person));

@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PersonDetailsService implements UserDetailsService {
-   private final PersonRep personRep;
+    private final PersonRep personRep;
 
-   public PersonDetailsService(PersonRep personRep){
-       this.personRep = personRep;
-   }
+    public PersonDetailsService(PersonRep personRep) {
+        this.personRep = personRep;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -22,4 +22,3 @@ public class PersonDetailsService implements UserDetailsService {
         return new PersonDetails(person);
     }
 }
-
