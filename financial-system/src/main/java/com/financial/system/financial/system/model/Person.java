@@ -17,15 +17,23 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false, unique = true)
+    private String email;
+    @Column(nullable = false)
+    private String password;
+    private String role = "ROLE_USER";
     private Boolean active;
 
     @Embedded
     private Address address;
 
-    public Person(PersonCreateDTO data){
+    public Person(PersonCreateDTO data, String encryptedPassword){
         this.active = true;
         this.name = data.name();
+        this.email = data.email();
+        this.password = encryptedPassword;
         if (data.address() != null) {
             this.address = new Address(data.address());
         }
@@ -37,6 +45,14 @@ public class Person {
 
     public String getName() {
         return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public Boolean isActive() {
@@ -58,5 +74,9 @@ public class Person {
 
     public void delete() {
         this.active = false;
+    }
+
+    public String getRole() {
+    return role;
     }
 }
