@@ -1,6 +1,7 @@
 package com.financial.system.financial.system.controller;
 
 import com.financial.system.financial.system.service.projection.ProjectionCalculator;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/projection")
+@SecurityRequirement(name = "bearer-key")
 public class ProjectionController {
     @Autowired
     private ProjectionCalculator projectionCalculator;

@@ -3,6 +3,7 @@ package com.financial.system.financial.system.controller;
 import com.financial.system.financial.system.dto.CategoryCreateDTO;
 import com.financial.system.financial.system.dto.CategoryListingDTO;
 import com.financial.system.financial.system.service.CategoryService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/categories")
+@SecurityRequirement(name = "bearer-key")
 public class CategoryController {
 
     @Autowired

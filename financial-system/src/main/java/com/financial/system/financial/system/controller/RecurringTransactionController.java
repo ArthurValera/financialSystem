@@ -4,6 +4,7 @@ import com.financial.system.financial.system.dto.RecurringTransactionCreateDTO;
 import com.financial.system.financial.system.dto.RecurringTransactionListingDTO;
 import com.financial.system.financial.system.dto.RecurringTransactionUpdateDTO;
 import com.financial.system.financial.system.service.RecurringTransactionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/recurring-transactions")
+@SecurityRequirement(name = "bearer-key")
 public class RecurringTransactionController {
 
     @Autowired
