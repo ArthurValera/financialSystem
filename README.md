@@ -1,6 +1,6 @@
 # Financial Management System
 
-This project is an API for **financial control**, enabling the management of people, financial transactions (revenues and expenses), and categories. It is structured following a layered approach, including **controllers**, **services**, **repositories**, **models**, and **DTOs**, ensuring organization and ease of maintenance.
+This project is an API for **personal financial control**, allowing you to manage people, one-time transactions, recurring transactions and categories. It is structured following a layered approach, including **controllers**, **services**, **repositories**, **models**, and **DTOs**, ensuring organization and ease of maintenance.
 
 ---
 
@@ -10,6 +10,20 @@ This project is an API for **financial control**, enabling the management of peo
 - Register transactions as **revenues** or **expenses**.
 - Associate transactions with a category and a person.
 - Record transaction descriptions, dates, amounts, and status.
+
+### 💰 **Recurring Transactions**
+- Register recurring transactions, such as subscriptions, monthly fees, or installments.
+- Create recurring incomes or expenses
+- Support for MONTHLY, WEEKLY, YEARLY recurrence
+- Infinite or limited recurrence (start/end dates)
+- Automatic projection and calculation
+- Manual generation of new recurring entries
+- Pagination and filtering for recurring transactions
+
+  
+   ```bash
+   GET /projection/{personId}?until=YYYY-MM-DD
+   ```
 
 ### 🗂️ **Category Management**
 - Register and manage categories to classify transactions.
@@ -24,13 +38,29 @@ This project is an API for **financial control**, enabling the management of peo
 - Validate relationships between entities (e.g., transactions and people, transactions and categories).
 - Input validation with Bean Validation annotations.
 
-### 🔐 **Security (Work in Progress)**
-- Currently implementing **Spring Security** to handle authentication and authorization.
-- Future plans include:
-  - Role-based access control (e.g., admin, user).
-  - JWT token authentication for secure API access.
-  - Password encryption with BCrypt.
-    
+### 🔐 **Security**
+- The API includes a complete authentication system using Spring Security and JWT tokens.
+- Login using email + password
+- Password hashing using BCrypt
+- Stateless authentication using JWT
+- Custom filter validates token on every request
+- Protected routes (except /auth/login and /person)
+
+- Authentication flow:
+  1. User logs in:
+    ```bash
+      POST /auth/login
+    ```
+  2. System returns:
+     ```bash
+       {
+          "token": "JWT_TOKEN_HERE"
+       }
+      ```
+  3. Use this token on all protected routes:
+     ```bash
+     Authorization: Bearer JWT_TOKEN_HERE
+     ```
 ---
 
 ## 🗂️ Project Structure
@@ -69,6 +99,13 @@ Data Transfer Objects for requests and responses:
 - `PessoaCreateDTO`
 - `PessoaUpdateDTO`
 
+### **Package `infra/security`**
+ Security Components:
+- `SecurityConfig`
+- `SecurityFilter`
+- `TokenService`
+- `PersonDetailsService`
+- 
 ### **Additional Components**
 - `FinancialSystemApplication`: Spring Boot entry point.
 - `application.properties`: Configuration file for the database and Hibernate.
@@ -78,13 +115,14 @@ Data Transfer Objects for requests and responses:
 
 ## 🚀 Technologies Used
 
-- **Java 21**: Main language.
-- **Spring Boot**: Framework for rapid backend development.
-- **Spring Data JPA**: ORM and repository abstraction.
-- **Hibernate Validator**: Input validation.
-- **Flyway**: Database migration management.
-- **MySQL**: Relational database.
-- **Maven**: Dependency management and build tool.
+- **Java 21**
+- **Spring Boot 3**
+- **Spring Data JPA**
+- **Spring Security** 
+- **Hibernate Validator**
+- **Flyway**
+- **MySQL**
+- **Maven**
 
 ---
 
@@ -104,24 +142,31 @@ Data Transfer Objects for requests and responses:
    ```bash
    git clone https://github.com/ArthurValera/financialSystem.git
    ```
-2. **Navigate to the project directory**
+2. **Configure your environment in application.properties**
    ```bash
-   cd financialSystem
-   ```
-3. **Open src/main/resources/application.properties and adjust credentials:**
-   ```bash
-   spring.datasource.url=jdbc:mysql://localhost:3306/financialsystem
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
-   spring.jpa.hibernate.ddl-auto=update
-   ```
-   Please make sure the database financialSystem exist.
+    spring.datasource.url=jdbc:mysql://localhost:3306/financialsystem
+    spring.datasource.username=YOUR_USER
+    spring.datasource.password=YOUR_PASSWORD
    
-4. **Install dependencies**
-   ```bash
-    mvn install
+    spring.jpa.hibernate.ddl-auto=update
    ```
-5. Run the project and access the API in your browser in localhost
+    Please make sure the database financialSystem exist.
+
+3. **Install dependencies:**
+   ```bash
+   mvn install
+   ```
+      
+4. **Run application**
+   ```bash
+    mvn spring-boot:run
+   ```
+- API will be available at:
+
+http://localhost:8080
+
+Swagger UI: http://localhost:8080/swagger-ui.html
+
 
 ## 📑 Main Endpoints
 **People**
@@ -132,6 +177,9 @@ Data Transfer Objects for requests and responses:
 - `PUT /pessoas/{id}: Update a person.`
 
 - `DELETE /pessoas/{id}: Delete a person.`
+
+**Authentication**
+-`POST /auth/login: Authenticate and receive a JWT token` 
 
 **Categories**
 - `POST /categorias: Register a category.`
