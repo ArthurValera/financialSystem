@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface RecurringTransactionRep extends JpaRepository<RecurringTransaction, Long> {
 
-    Page<RecurringTransaction> findByActiveTrue(Pageable pageable);
+    Page<RecurringTransaction> findByActiveTrueAndPersonId(Long personId, Pageable pageable);
 
     List<RecurringTransaction> findByPersonIdAndActiveTrue(Long personId);
 }

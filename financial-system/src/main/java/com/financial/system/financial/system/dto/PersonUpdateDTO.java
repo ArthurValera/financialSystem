@@ -1,8 +1,5 @@
 package com.financial.system.financial.system.dto;
 
-import jakarta.validation.constraints.NotNull;
-
-public record PersonUpdateDTO(@NotNull Long id,
-                              String name,
+public record PersonUpdateDTO(String name,
                               AddressDTO address) {
 }

@@ -86,7 +86,7 @@ public class Transaction {
         return person;
     }
 
-    public void update(@Valid TransactionUpdateDTO data, Person person, Category category) {
+    public void update(@Valid TransactionUpdateDTO data, Category category) {
         if (data.description() != null) {
             this.description = data.description();
         }
@@ -107,9 +107,6 @@ public class Transaction {
         }
         if (category != null) {
             this.category = category;
-        }
-        if (person != null) {
-            this.person = person;
         }
     }
 

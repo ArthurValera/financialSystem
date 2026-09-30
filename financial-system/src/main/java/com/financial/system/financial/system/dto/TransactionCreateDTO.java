@@ -21,8 +21,6 @@ public record TransactionCreateDTO(@NotBlank
                                    String note,
 
                                    @NotNull
-                                  Long categoryId,
-                                   @NotNull
-                                  Long peopleId) {
+                                  Long categoryId) {
 
 }

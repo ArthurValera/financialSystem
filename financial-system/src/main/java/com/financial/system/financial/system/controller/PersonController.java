@@ -4,6 +4,7 @@ import com.financial.system.financial.system.dto.PersonCreateDTO;
 import com.financial.system.financial.system.dto.PersonDetailDTO;
 import com.financial.system.financial.system.dto.PersonListingDTO;
 import com.financial.system.financial.system.dto.PersonUpdateDTO;
+import com.financial.system.financial.system.infra.security.user.PersonDetails;
 import com.financial.system.financial.system.service.PersonService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -43,15 +45,16 @@ public class PersonController {
 
     @PutMapping
     @SecurityRequirement(name = "bearer-key")
-    public ResponseEntity<PersonDetailDTO> update(@RequestBody @Valid PersonUpdateDTO data) {
-        var person = personService.update(data);
+    public ResponseEntity<PersonDetailDTO> update(@RequestBody @Valid PersonUpdateDTO data,
+                                                    @AuthenticationPrincipal PersonDetails principal) {
+        var person = personService.update(data, principal.getId());
         return ResponseEntity.ok(new PersonDetailDTO(person));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     @SecurityRequirement(name = "bearer-key")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        personService.delete(id);
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal PersonDetails principal) {
+        personService.delete(principal.getId());
         return ResponseEntity.noContent().build();
     }
 }

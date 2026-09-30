@@ -14,6 +14,11 @@ public class PersonDetails implements UserDetails {
     public PersonDetails(Person person){
         this.person = person;
     }
+
+    public Long getId() {
+        return person.getId();
+    }
+
     @Override
     public String getPassword() {
         return person.getPassword();

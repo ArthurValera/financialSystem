@@ -22,8 +22,6 @@ public record RecurringTransactionCreateDTO(
         @NotNull
         TransactionType transactionType,
         @NotNull
-        Long categoryId,
-        @NotNull
-        Long personId){
+        Long categoryId){
 }
 

@@ -12,6 +12,5 @@ public record TransactionUpdateDTO(@NotNull Long id,
                                    LocalDate paymentDate,
                                    TransactionType type,
                                    String note,
-                                   Long categoryId,
-                                   Long personId) {
+                                   Long categoryId) {
 }

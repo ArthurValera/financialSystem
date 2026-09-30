@@ -14,6 +14,5 @@ public record RecurringTransactionUpdateDTO(
         LocalDate endDate,
         RecurrenceType recurrenceType,
         TransactionType transactionType,
-        Long categoryId,
-        Long personId){
+        Long categoryId){
 }

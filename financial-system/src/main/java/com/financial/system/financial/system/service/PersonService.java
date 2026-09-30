@@ -35,8 +35,8 @@ public class PersonService {
     }
 
     @Transactional
-    public Person update(PersonUpdateDTO data){
-        var person = personRep.getReferenceById(data.id());
+    public Person update(PersonUpdateDTO data, Long id){
+        var person = personRep.getReferenceById(id);
         person.update(data);
         return person;
     }

@@ -60,7 +60,7 @@ public class RecurringTransaction {
         this.active = true;
     }
 
-    public void update(RecurringTransactionUpdateDTO data, Person person, Category category) {
+    public void update(RecurringTransactionUpdateDTO data, Category category) {
         if (data.name() != null) this.name = data.name();
         if (data.amount() != null) this.amount = data.amount();
         if (data.startDate() != null) this.startDate = data.startDate();
@@ -68,7 +68,6 @@ public class RecurringTransaction {
         if (data.recurrenceType() != null) this.recurrenceType = data.recurrenceType();
         if (data.transactionType() != null) this.type = data.transactionType();
         if (category != null) this.category = category;
-        if (person != null) this.person = person;
     }
 
     public void delete() {
