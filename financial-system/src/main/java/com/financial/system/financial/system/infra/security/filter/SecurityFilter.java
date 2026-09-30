@@ -52,7 +52,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (JWTVerificationException exception) {
-                System.out.println("Token invalido: " + exception.getMessage());
+                logger.warn("Token invalido: " + exception.getMessage());
             }
         }
 

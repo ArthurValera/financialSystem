@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     private final AuthenticationManager manager;
     private final TokenService tokenService;
-        public AuthenticationController(AuthenticationManager manager, TokenService tokenService) {
+    public AuthenticationController(AuthenticationManager manager, TokenService tokenService) {
         this.manager = manager;
         this.tokenService = tokenService;
     }
