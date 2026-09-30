@@ -4,17 +4,16 @@ import com.financial.system.financial.system.dto.TransactionCreateDTO;
 import com.financial.system.financial.system.dto.TransactionListingDTO;
 import com.financial.system.financial.system.dto.TransactionUpdateDTO;
 import com.financial.system.financial.system.model.Category;
-import com.financial.system.financial.system.model.Person;
 import com.financial.system.financial.system.model.Transaction;
-import com.financial.system.financial.system.model.TransactionType;
 import com.financial.system.financial.system.repository.CategoryRep;
 import com.financial.system.financial.system.repository.PersonRep;
 import com.financial.system.financial.system.repository.TransactionRep;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TransactionService {
@@ -28,38 +27,48 @@ public class TransactionService {
     private CategoryRep categoryRep;
 
     @Transactional
-    public Transaction create(TransactionCreateDTO data){
+    public Transaction create(TransactionCreateDTO data, Long ownerId){
         var category = categoryRep.findById(data.categoryId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada."));
-        var person = personRep.findById(data.peopleId())
-                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
+                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada."));
+        // The owner is always the authenticated caller - never a client-supplied id.
+        var owner = personRep.getReferenceById(ownerId);
 
-        var transaction = new Transaction(data, category, person);
+        var transaction = new Transaction(data, category, owner);
         return transactionRep.save(transaction);
     }
 
-    public Page<TransactionListingDTO> read(Pageable pageable){
-        return transactionRep.findByActiveTrue(pageable).map(TransactionListingDTO::new);
+    public Page<TransactionListingDTO> read(Long ownerId, Pageable pageable){
+        return transactionRep.findByActiveTrueAndPersonId(ownerId, pageable).map(TransactionListingDTO::new);
     }
 
-    public Transaction update(TransactionUpdateDTO data){
-        var transaction = transactionRep.getReferenceById(data.id());
+    @Transactional
+    public Transaction update(TransactionUpdateDTO data, Long ownerId){
+        var transaction = transactionRep.findById(data.id())
+                .orElseThrow(() -> new EntityNotFoundException("Transação não encontrada."));
+
+        if (!transaction.getPerson().getId().equals(ownerId)) {
+            throw new EntityNotFoundException("Transação não encontrada.");
+        }
 
         Category category = null;
         if(data.categoryId() != null){
-            category = categoryRep.findById(data.categoryId()).orElseThrow(() -> new RuntimeException("Categoria não encontrada."));
+            category = categoryRep.findById(data.categoryId())
+                    .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada."));
         }
 
-        Person person = null;
-        if (data.personId() != null) {
-            person = personRep.findById(data.personId()).orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
-        }
-        transaction.update(data, person, category);
-        return transactionRep.save(transaction);
+        transaction.update(data, category);
+        return transaction;
     }
 
-    public void delete(Long id){
-        var transaction = transactionRep.getReferenceById(id);
+    @Transactional
+    public void delete(Long id, Long ownerId){
+        var transaction = transactionRep.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Transação não encontrada."));
+
+        if (!transaction.getPerson().getId().equals(ownerId)) {
+            throw new EntityNotFoundException("Transação não encontrada.");
+        }
+
         transaction.delete();
     }
 }

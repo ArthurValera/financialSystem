@@ -2,6 +2,7 @@ package com.financial.system.financial.system.service.projection;
 
 import com.financial.system.financial.system.model.RecurrenceType;
 import com.financial.system.financial.system.model.RecurringTransaction;
+import com.financial.system.financial.system.model.Transaction;
 import com.financial.system.financial.system.model.TransactionType;
 import com.financial.system.financial.system.repository.RecurringTransactionRep;
 import com.financial.system.financial.system.repository.TransactionRep;
@@ -28,29 +29,42 @@ public class ProjectionCalculator {
 
     public BigDecimal projectBalance(Long personId, LocalDate until) {
 
-        BigDecimal currentBalance = transactionRep.sumBalanceOfPerson(personId);
+        LocalDate today = LocalDate.now();
+
+        BigDecimal projected = transactionRep.sumBalanceOfPerson(personId, today);
+
+        for (var t : transactionRep.findScheduledByPerson(personId, today, until)) {
+            projected = (t.getType() == TransactionType.INCOME)
+                    ? projected.add(t.getAmount())
+                    : projected.subtract(t.getAmount());
+        }
 
         List<RecurringTransaction> recurringList = recurringRep.findByPersonIdAndActiveTrue(personId);
 
         for (var r : recurringList) {
             LocalDate start = r.getStartDate();
-            LocalDate end = r.getEndDate() != null && r.getEndDate().isBefore(until) ? r.getEndDate() : until;
+            LocalDate end = (r.getEndDate() != null && r.getEndDate().isBefore(until))
+                    ? r.getEndDate()
+                    : until;
 
             if (start == null || start.isAfter(end)) continue;
 
             var policy = policies.get(r.getRecurrenceType());
             if (policy == null) continue;
 
-            var dates = policy.generateOccurrences(start, end);
+            long futureOccurrences = policy.generateOccurrences(start, end).stream()
+                    .filter(date -> date.isAfter(today))
+                    .count();
 
-            for (var date : dates) {
-                if (r.getType() == TransactionType.INCOME)
-                    currentBalance = currentBalance.add(r.getAmount());
-                else
-                    currentBalance = currentBalance.subtract(r.getAmount());
-            }
+            if (futureOccurrences == 0) continue;
+
+            BigDecimal delta = r.getAmount().multiply(BigDecimal.valueOf(futureOccurrences));
+
+            projected = (r.getType() == TransactionType.INCOME)
+                    ? projected.add(delta)
+                    : projected.subtract(delta);
         }
 
-        return currentBalance;
+        return projected;
     }
 }

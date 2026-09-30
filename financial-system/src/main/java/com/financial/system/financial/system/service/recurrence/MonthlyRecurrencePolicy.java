@@ -10,15 +10,15 @@ public class MonthlyRecurrencePolicy implements RecurrencePolicy {
     @Override
     public List<LocalDate> generateOccurrences(LocalDate start, LocalDate end) {
         List<LocalDate> dates = new ArrayList<>();
+
+        int anchorDay = start.getDayOfMonth();
         LocalDate current = start;
 
         while (!current.isAfter(end)) {
             dates.add(current);
 
             YearMonth nextMonth = YearMonth.from(current).plusMonths(1);
-
-            int day = Math.min(current.getDayOfMonth(), nextMonth.lengthOfMonth());
-
+            int day = Math.min(anchorDay, nextMonth.lengthOfMonth());
             current = nextMonth.atDay(day);
         }
 

@@ -68,7 +68,11 @@ public class Person {
             this.name = data.name();
         }
         if (data.address() != null){
-            this.address.update(data.address());
+            if (this.address == null) {
+                this.address = new Address(data.address());
+            } else {
+                this.address.update(data.address());
+            }
         }
     }
 
