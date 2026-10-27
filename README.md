@@ -76,7 +76,7 @@ Cross-cutting concerns:
 
 ### **Additional Components**
 - `FinancialSystemApplication`: Spring Boot entry point.
-- `application.properties`: configuration for the database, JWT secret, and Hibernate (git-ignored — see below).
+- `application.properties`: configuration for the database and JWT secret. Contains no secrets — every sensitive value is read from an environment variable (see below).
 - `db/migration`: Flyway migration scripts.
 
 ---
@@ -91,51 +91,96 @@ Cross-cutting concerns:
 - **MySQL** — relational database.
 - **springdoc-openapi** — Swagger UI / OpenAPI docs.
 - **Maven** — dependency management and build tool.
+- **Docker / Docker Compose** — containerized app + MySQL.
 
 ---
 
-## 📂 How to Run the Project
+## ⚙️ Configuration
+
+`financial-system/src/main/resources/application.properties` is committed and contains no secrets — it reads everything sensitive from environment variables:
+
+| Variable      | Required | Default                                              | Purpose                          |
+|---------------|----------|------------------------------------------------------|----------------------------------|
+| `DB_PASSWORD` | yes      | —                                                    | MySQL password                   |
+| `JWT_SECRET`  | yes      | —                                                    | HMAC secret used to sign JWTs    |
+| `DB_URL`      | no       | `jdbc:mysql://localhost:3306/financialsystem_api`    | JDBC URL                         |
+| `DB_USERNAME` | no       | `root`                                               | MySQL user                       |
+
+Flyway creates the schema automatically on startup — do **not** set `spring.jpa.hibernate.ddl-auto=update`, it would fight with the Flyway migrations.
+
+---
+
+## 🐳 How to Run with Docker (recommended)
+
+Runs both the API and MySQL in containers — no local Java, Maven, or MySQL needed.
 
 ### Prerequisites
-- Java 21
-- MySQL installed and running
-- Maven (or use the bundled `mvnw`/`mvnw.cmd` wrapper — no local Maven install required)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (running)
 
 ### Steps
 
 1. **Clone this repository**
    ```bash
    git clone https://github.com/ArthurValera/financialSystem.git
-   cd "financial system/financial-system"
+   cd "financial system"
    ```
-   All commands below run from `financial-system/`, not the repository root.
+   Docker commands run from the repository root (where `docker-compose.yml` is).
 
-2. **Create the database**
+2. **Create your `.env`** from the template and fill in both values:
+   ```bash
+   cp .env.example .env
+   ```
+   ```properties
+   DB_PASSWORD=<any strong password>
+   JWT_SECRET=<a long random string>
+   ```
+   `.env` is git-ignored. Generate values with e.g. `openssl rand -hex 32`.
+
+3. **Build and start**
+   ```bash
+   docker compose up -d --build
+   ```
+   The API waits for MySQL to be healthy, then Flyway applies the migrations.
+
+4. **Explore the API** at `http://localhost:8080/swagger-ui.html`.
+
+### Useful commands
+```bash
+docker compose logs -f api     # follow API logs (or: docker logs -f financial-api)
+docker compose ps              # container status
+docker compose up -d --build   # rebuild after code changes
+docker compose down            # stop (database data is kept in the db_data volume)
+docker compose down -v         # stop AND wipe the database
+docker compose up -d db        # run only MySQL, then run the API from your IDE
+```
+
+MySQL is exposed on **`localhost:3307`** (user `root`, password = your `DB_PASSWORD`) so it does not clash with a local MySQL on 3306.
+
+---
+
+## 📂 How to Run Locally (without Docker)
+
+### Prerequisites
+- Java 21
+- MySQL installed and running (or just the Docker `db` service — see above)
+- Maven (or use the bundled `mvnw`/`mvnw.cmd` wrapper — no local Maven install required)
+
+### Steps
+
+1. **Create the database** (skip if using the Docker `db` service)
    ```sql
    CREATE DATABASE financialsystem_api;
    ```
 
-3. **Configure `src/main/resources/application.properties`** (git-ignored — copy `application-exemple.properties` as a starting point, or create it directly):
-   ```properties
-   spring.application.name=financial-system
-   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-   spring.datasource.url=jdbc:mysql://localhost:3306/financialsystem_api
-   spring.datasource.username=root
-   spring.datasource.password=${DB_PASSWORD}
+2. **Set the environment variables** `DB_PASSWORD` and `JWT_SECRET` (in IntelliJ: *Run → Edit Configurations → Environment variables*). If you're using the Docker `db` service, also set `DB_URL=jdbc:mysql://localhost:3307/financialsystem_api`.
 
-   server.error.include-stacktrace=never
-
-   api.security.token.secret=${JWT_SECRET}
-   ```
-   Set `DB_PASSWORD` and `JWT_SECRET` as environment variables rather than hardcoding them. Flyway creates the schema automatically on startup — do **not** set `spring.jpa.hibernate.ddl-auto=update`, it would fight with the Flyway migrations.
-
-4. **Run the project**
+3. **Run the project** from `financial-system/`
    ```bash
    ./mvnw spring-boot:run
    ```
    (use `mvnw.cmd` on Windows)
 
-5. **Explore the API** at `http://localhost:8080/swagger-ui.html`.
+4. **Explore the API** at `http://localhost:8080/swagger-ui.html`.
 
 ---
 
